@@ -7,24 +7,29 @@ require("mason").setup({
 		},
 	},
 })
+require("neodev").setup({})
 require("mason-lspconfig").setup()
 require("mason-lspconfig").setup_handlers {
-	-- The first entry (without a key) will be the default handler
-	-- and will be called for each installed server that doesn't have
-	-- a dedicated handler.
-	function (server_name) -- default handler (optional)
-		require("lspconfig")[server_name].setup {}
+	function(server_name)
+		local opt = {
+			on_attach = function(_, _)
+				vim.api.nvim_create_autocmd("BufWritePre", {
+					callback = function()
+						vim.lsp.buf.format()
+					end
+				})
+			end,
+			capabilities = require("cmp_nvim_lsp").default_capabilities()
+		}
+		require("lspconfig")[server_name].setup(opt)
 	end,
-
-	-- Next, you can provide a dedicated handler for specific servers.
-	-- For example, a handler override for the `rust_analyzer`:
-	-- ["rust_analyzer"] = function ()
-	-- 	require("rust-tools").setup {}
-	-- end,
 	["sumneko_lua"] = function()
 		require("lspconfig").sumneko_lua.setup({
 			settings = {
 				Lua = {
+					completion = {
+						callSnippet = "Replace",
+					},
 					diagnostics = {
 						globals = { "vim", "use", },
 					},
@@ -41,8 +46,8 @@ require("mason-lspconfig").setup_handlers {
 	end,
 }
 
-vim.keymap.set('n', 'K',  '<cmd>lua vim.lsp.buf.hover()<CR>')
-vim.keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.formatting()<CR>')
+vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+vim.keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.format()<CR>')
 vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
 vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
 vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
@@ -62,7 +67,7 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 local cmp = require("cmp")
 local lspkind = require("lspkind")
 
-cmp.setup({
+local opt = {
 	formatting = {
 		format = lspkind.cmp_format({
 			mode = "symbol",
@@ -111,32 +116,25 @@ cmp.setup({
 		{ name = 'path' },
 		{ name = 'vsnip' },
 	})
-})
-
--- Set configuration for specific filetype.
+}
+cmp.setup(opt)
 cmp.setup.filetype('gitcommit', {
 	sources = cmp.config.sources({
 		{ name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
 	}, {
-			{ name = 'buffer' },
-		})
+		{ name = 'buffer' },
+	})
 })
-
--- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
 	mapping = cmp.mapping.preset.cmdline(),
 	sources = {
 		{ name = 'buffer' }
 	}
 })
-
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline(':', {
 	mapping = cmp.mapping.preset.cmdline(),
 	sources = cmp.config.sources({
-		{ name = 'path' }
-	}, {
-			{ name = 'cmdline' }
-		})
+		{ name = 'path' },
+		{ name = 'cmdline' }
+	})
 })
-

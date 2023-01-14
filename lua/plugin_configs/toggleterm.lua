@@ -1,9 +1,9 @@
 require("toggleterm").setup({
-    size = 70,
-    hide_numbers = true,
-    shade_terminals = true,
-    start_in_insert = false,
-    direction = "vertical"
+	size = 70,
+	hide_numbers = true,
+	shade_terminals = true,
+	start_in_insert = false,
+	direction = "vertical"
 })
 
 local set = vim.keymap.set

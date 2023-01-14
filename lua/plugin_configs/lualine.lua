@@ -31,7 +31,8 @@ local config = {
 	options = {
 		component_separators = '',
 		section_separators = '',
-		theme = 'onenord'
+		theme = 'onenord',
+		-- globalstatus = true,
 	},
 	sections = {
 		lualine_a = {},

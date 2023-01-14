@@ -1,15 +1,15 @@
-local is_windows = vim.loop.os_uname().sysname == "Windows_NT"
-local sep = is_windows and [[\]] or [[/]]
+local settings = require("core.settings")
+local sep = settings.is_windows and [[\]] or [[/]]
 local function join(...)
-	return table.concat({...}, sep)
+	return table.concat({ ... }, sep)
 end
-local home = is_windows and os.getenv("USERPROFILE") or os.getenv('HOME')
-local len = #home
-local home_path = join(home, '.config', 'nvim')
-local cache_path = join(home, '.cache', 'nvim')
-local rtp = { home_path, cache_path }
+
+local home = settings.home_path
+local config_path = settings.config_path
+local cache_path = settings.cache_path
+local rtp = { config_path, cache_path }
 for _, p in ipairs(vim.opt.runtimepath:get()) do
-	if p:sub(1, len) ~= home then
+	if p:sub(1, #home) ~= home then
 		rtp[#rtp + 1] = p
 	end
 end
@@ -37,9 +37,9 @@ if vim.fn.isdirectory(packer_install_path) == 0 then
 	packer_bootstrap = true
 end
 
-return require("packer").startup({function()
+
+return require("packer").startup({ function()
 	use "wbthomason/packer.nvim" -- プラグイン管理ツール
-	use "lewis6991/impatient.nvim" -- 起動速度改善用
 	use "nathom/filetype.nvim" -- デフォルトのより早いfiletype
 	use { -- 起動時間を表示する
 		"dstein64/vim-startuptime",
@@ -75,9 +75,9 @@ return require("packer").startup({function()
 		event = "BufReadPre",
 		requires = {
 			{ "williamboman/mason.nvim", opt = true },
-			{ "williamboman/mason-lspconfig.nvim", opt = true},
-			{ "jose-elias-alvarez/null-ls.nvim", opt = true},
-			{ "onsails/lspkind.nvim", opt = true},
+			{ "williamboman/mason-lspconfig.nvim", opt = true },
+			{ "jose-elias-alvarez/null-ls.nvim", opt = true },
+			{ "onsails/lspkind.nvim", opt = true },
 			{ "hrsh7th/nvim-cmp", opt = true },
 			{ "hrsh7th/cmp-path", opt = true },
 			{ "hrsh7th/cmp-buffer", opt = true },
@@ -85,8 +85,11 @@ return require("packer").startup({function()
 			{ "hrsh7th/cmp-nvim-lsp", opt = true },
 			{ "hrsh7th/cmp-vsnip", opt = true },
 			{ "hrsh7th/vim-vsnip", opt = true },
+			{ "SmiteshP/nvim-navic", opt = true },
+			{ "folke/neodev.nvim", opt = true },
 		},
 		wants = {
+			"nvim-navic",
 			"mason.nvim",
 			"mason-lspconfig.nvim",
 			"null-ls.nvim",
@@ -98,13 +101,31 @@ return require("packer").startup({function()
 			"cmp-nvim-lsp",
 			"cmp-vsnip",
 			"vim-vsnip",
+			"neodev.nvim",
 		},
 		config = function() require('plugin_configs.lsp') end,
+	}
+	use {
+		"SmiteshP/nvim-navic",
+		opt = true,
+	}
+	-- } -------------------------- debug -------------------------------- {
+	use {
+		"mfussenegger/nvim-dap",
+		opt = true,
+	}
+	use {
+		"rcarriga/nvim-dap-ui",
+		opt = true,
+	}
+	use {
+		"mfussenegger/nvim-dap-python",
+		opt = true,
 	}
 	-- } -------------------------- 検索関連 -------------------------------- {
 	use { -- ファイルツリー
 		"nvim-tree/nvim-tree.lua",
-		keys = { {"n", "sf"}, },
+		keys = { { "n", "sf" }, },
 		setup = function()
 			vim.keymap.set("n", "sf", ":NvimTreeToggle<CR>")
 		end,
@@ -116,17 +137,17 @@ return require("packer").startup({function()
 	}
 	use { -- root設定
 		"airblade/vim-rooter",
-		event = {"BufAdd", "BufWipeout"},
+		event = { "BufAdd", "BufWipeout" },
 	}
 	use { -- 多種多様なものを検索する最強プラグイン
 		"nvim-telescope/telescope.nvim",
 		cmd = "Telescope",
 		module = "telescope",
 		keys = {
-			{"n", "<Leader>tf"},
-			{"n", "<Leader>tb"},
-			{"n", "<Leader>tm"},
-			{"n", "<Leader>tg"},
+			{ "n", "<Leader>tf" },
+			{ "n", "<Leader>tb" },
+			{ "n", "<Leader>tm" },
+			{ "n", "<Leader>tg" },
 		},
 		setup = function()
 			vim.keymap.set("n", "<Leader>tf", ":Telescope find_files<CR>")
@@ -135,15 +156,15 @@ return require("packer").startup({function()
 			vim.keymap.set("n", "<Leader>tg", ":Telescope live_grep<CR>")
 		end,
 		requires = {
-			{"airblade/vim-rooter", opt = true},
-			{"ahmedkhalf/project.nvim", opt = true},
-			{"nvim-lua/plenary.nvim", opt = true},
-			{"crispgm/telescope-heading.nvim", opt = true},
-			{"nvim-telescope/telescope-github.nvim", opt = true},
-			{"nvim-telescope/telescope-ui-select.nvim", opt = true},
-			{"nvim-telescope/telescope-file-browser.nvim", opt = true},
-			{"nvim-telescope/telescope-smart-history.nvim", opt = true},
-			{"kkharji/sqlite.lua", opt = true}
+			{ "airblade/vim-rooter", opt = true },
+			{ "ahmedkhalf/project.nvim", opt = true },
+			{ "nvim-lua/plenary.nvim", opt = true },
+			{ "crispgm/telescope-heading.nvim", opt = true },
+			{ "nvim-telescope/telescope-github.nvim", opt = true },
+			{ "nvim-telescope/telescope-ui-select.nvim", opt = true },
+			{ "nvim-telescope/telescope-file-browser.nvim", opt = true },
+			{ "nvim-telescope/telescope-smart-history.nvim", opt = true },
+			{ "kkharji/sqlite.lua", opt = true },
 		},
 		wants = {
 			"vim-rooter",
@@ -160,7 +181,7 @@ return require("packer").startup({function()
 	}
 	use { -- エラー等一覧表示
 		"folke/trouble.nvim",
-		keys = {{"n", "<C-t>"}},
+		keys = { { "n", "<C-t>" } },
 		setup = function()
 			vim.keymap.set("n", "<C-t>", ":TroubleToggle<CR>")
 		end,
@@ -185,8 +206,8 @@ return require("packer").startup({function()
 	use { -- 文字のない部分を飛ばすjk移動
 		"haya14busa/vim-edgemotion",
 		keys = {
-			{"n", "<Leader>j"}, {"n", "<Leader>k"},
-			{"v", "<Leader>j"}, {"v", "<Leader>k"},
+			{ "n", "<Leader>j" }, { "n", "<Leader>k" },
+			{ "v", "<Leader>j" }, { "v", "<Leader>k" },
 		},
 		setup = function()
 			local set = vim.keymap.set
@@ -201,7 +222,7 @@ return require("packer").startup({function()
 	use { -- カーソル移動をどこでも一発で
 		"phaazon/hop.nvim",
 		tag = "v2",
-		keys = {{"n", "<Leader>ow"}, {"n", "<Leader>ov"}},
+		keys = { { "n", "<Leader>ow" }, { "n", "<Leader>ov" } },
 		setup = function()
 			local set = vim.keymap.set
 			set("n", "<Leader>ow", "<cmd>HopWord<CR>")
@@ -218,6 +239,20 @@ return require("packer").startup({function()
 		"tpope/vim-commentary",
 		event = "BufReadPost",
 	}
+	-- use {
+	-- 	"JoosepAlviste/nvim-ts-context-commentstring",
+	-- 	event = "BufReadPre",
+	-- 	config = function()
+	-- 		require("nvim-treesitter.configs").setup({
+	-- 			context_commentstring = {
+	-- 				enable = true
+	-- 			}
+	-- 		})
+	-- 	end,
+	-- 	requires = {
+	-- 		{ "nvim-treesitter/nvim-treesitter", opt = true },
+	-- 	},
+	-- }
 	use { -- editorconfigの使用
 		"editorconfig/editorconfig-vim",
 		opt = true,
@@ -248,20 +283,20 @@ return require("packer").startup({function()
 	}
 	use { -- 背景透過, shell側で画像を背景にしていればそれが見える
 		"xiyaowong/nvim-transparent",
-		keys = {{"n", "<Leader>p"}},
+		keys = { { "n", "<Leader>p" } },
 		setup = function()
 			vim.g.transparent_enabled = true
 			local set = vim.keymap.set
-			set({"n"}, "<Leader>p", ":TransparentToggle<CR>")
+			set({ "n" }, "<Leader>p", ":TransparentToggle<CR>")
 		end,
 		config = function() require("plugin_configs.transparent") end,
 	}
 	use { -- 通知をリッチに
 		"folke/noice.nvim",
-		event = {"CmdLineEnter"},
+		event = { "CmdLineEnter" },
 		requires = {
-			{"MunifTanjim/nui.nvim", opt = true},
-			{"rcarriga/nvim-notify", opt = true},
+			{ "MunifTanjim/nui.nvim", opt = true },
+			{ "rcarriga/nvim-notify", opt = true },
 		},
 		wants = {
 			"nvim-notify",
@@ -343,13 +378,13 @@ return require("packer").startup({function()
 	use { -- indentを見やすくする
 		"lukas-reineke/indent-blankline.nvim",
 		event = "BufReadPost",
-		config = function() require("plugin_configs.indent_visualizer") end,
+		config = function() require("plugin_configs.indent-blankline") end,
 	}
 	-- } -------------------------- ターミナル ------------------------------ {
 	use { -- ターミナルを使いやすくする
 		"akinsho/toggleterm.nvim",
 		tag = "v2.*",
-		keys = {{"n", "<C-]>"}, {"i", "<C-]>"}},
+		keys = { { "n", "<C-]>" }, { "i", "<C-]>" } },
 		setup = function()
 			vim.keymap.set("n", "<C-]>", "<cmd>ToggleTerm<CR>")
 			vim.keymap.set("i", "<C-]>", "<Esc><cmd>ToggleTerm<CR>")
@@ -361,14 +396,39 @@ return require("packer").startup({function()
 		"simrat39/rust-tools.nvim",
 		ft = { "rs" },
 	}
+	use {
+		"akinsho/flutter-tools.nvim",
+		ft = { "dart" },
+		cmd = {
+			"FlutterRun",
+			"FlutterDevices",
+			"FlutterEmulators",
+			"FlutterReload",
+			"FlutterRestart",
+			"FlutterQuit",
+			"FlutterDetach",
+			"FlutterOutlineToggle",
+			"FlutterOutlineOpen",
+			"FlutterDevTools",
+			"FlutterCopyProfilerUrl",
+			"FlutterLspRestart",
+			"FlutterSuper",
+			"FlutterReanalyze",
+		},
+		requires = {
+			"nvim-lua/plenary.nvim",
+		},
+		wants = { "plenary.nvim" },
+		config = function() require("flutter-tools").setup({}) end,
+	}
 	-- } ----------------------------------------------------------------------
 
 	if packer_bootstrap then
 		require('packer').sync()
 	end
 end,
-config = {
-	package_root = package_root,
-	compile_path = compile_path,
-}
+	config = {
+		package_root = package_root,
+		compile_path = compile_path,
+	}
 })

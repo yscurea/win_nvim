@@ -2,30 +2,38 @@ local vim = vim
 local set = vim.opt
 
 local set_user_option = function()
-    set.encoding       = "utf-8"
-    set.number         = true
-    set.relativenumber = true
-    set.hidden         = true
-    set.wrap           = false
-    set.autoread       = true
-    set.showcmd        = true
-    set.wildmenu       = true
-    set.cursorline     = true
-    set.pumblend       = 15
-    set.autoindent     = true
-    set.smartindent    = true
-    set.ignorecase     = true
-    set.incsearch      = true
-    set.backup         = false
-    set.swapfile       = false
-    set.writebackup    = false
-    set.cmdheight      = 1
-    set.updatetime     = 300
-    set.laststatus     = 2
-    set.signcolumn     = "yes"
-    set.tabstop        = 4
-    set.shiftwidth     = 4
-    set.colorcolumn    = "80"
+	set.encoding       = "utf-8"
+	set.number         = true
+	set.relativenumber = true
+	set.hidden         = true
+	set.wrap           = false
+	set.autoread       = true
+	set.showcmd        = true
+	set.wildmenu       = true
+	set.cursorline     = true
+	set.pumblend       = 15
+	set.autoindent     = true
+	set.smartindent    = true
+	set.ignorecase     = true
+	set.incsearch      = true
+	set.backup         = false
+	set.swapfile       = false
+	set.writebackup    = false
+	set.cmdheight      = 1
+	set.updatetime     = 300
+	set.laststatus     = 3
+	set.signcolumn     = "yes"
+	set.colorcolumn    = "80"
+	set.list           = true
+	set.listchars      = "tab:  ,nbsp:+,trail: ,extends:→,precedes:←"
+	set.showtabline    = 2
+	set.showbreak      = "↳  "
+	set.tabstop        = 4
+	set.shiftwidth     = 4
+	set.softtabstop    = 4
+	set.expandtab      = false
+	set.smarttab       = true
+	set.showtabline    = 2
 
 	local powershell_options = {
 		shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell",
@@ -38,6 +46,14 @@ local set_user_option = function()
 	for option, value in pairs(powershell_options) do
 		vim.opt[option] = value
 	end
+
+	vim.api.nvim_create_autocmd(
+		{ "TermOpen" },
+		{
+			pattern = "*",
+			command = "startinsert"
+		}
+	)
 end
 
 local disable_distribution_plugins = function()
@@ -51,7 +67,7 @@ local disable_distribution_plugins = function()
 	vim.g.loaded_gzip               = 1
 	vim.g.loaded_man                = 1
 	vim.g.loaded_matchit            = 1
-	vim.g.loaded_netrw 				= 1
+	vim.g.loaded_netrw              = 1
 	vim.g.loaded_netrwPlugin        = 1
 	vim.g.loaded_remote_plugins     = 1
 	vim.g.loaded_shada_plugin       = 1
@@ -61,9 +77,9 @@ local disable_distribution_plugins = function()
 	vim.g.loaded_zipPlugin          = 1
 	vim.g.skip_loading_mswin        = 1
 	-- vim.g.loaded_clipboard_provider = 1
-    if vim.fn.has("gui_running") == false then
-        vim.g.loaded_matchparen = 1
-    end
+	if vim.fn.has("gui_running") == false then
+		vim.g.loaded_matchparen = 1
+	end
 	vim.api.nvim_create_autocmd(
 		"TextYankPost",
 		{
@@ -99,26 +115,26 @@ local clipboard_config = function()
 			cache_enabled = 0,
 		}
 	elseif settings.is_windows then
-		vim.opt.clipboard:append{'unnamedplus'}
+		vim.opt.clipboard:append { 'unnamedplus' }
 	end
 end
 
 local theme_config = function()
-    if vim.fn.has('nvim') == 1 then
-        vim.cmd [[let $NVIM_TUI_ENABLE_TRUE_COLOR=1]]
-        if vim.fn.has("termguicolors") == 1 then
-            vim.opt.termguicolors = true
-        end
-    end
-    vim.cmd [[syntax on]]
-    vim.api.nvim_command([[set background=dark]])
+	if vim.fn.has('nvim') == 1 then
+		vim.cmd [[let $NVIM_TUI_ENABLE_TRUE_COLOR=1]]
+		if vim.fn.has("termguicolors") == 1 then
+			vim.opt.termguicolors = true
+		end
+	end
+	vim.cmd [[syntax on]]
+	vim.api.nvim_command([[set background=dark]])
 end
 
 local set_options = function()
-    disable_distribution_plugins()
-    set_user_option()
-    clipboard_config()
-    theme_config()
+	disable_distribution_plugins()
+	set_user_option()
+	clipboard_config()
+	theme_config()
 end
 
 set_options()

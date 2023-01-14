@@ -1,6 +1,12 @@
 require("transparent").setup({
 	enable = false,
-	extra_groups = {},
+	extra_groups = {
+		"NvimTreeLspDiagnosticsError",
+		"NvimTreeLspDiagnosticsWarning",
+		"NvimTreeLspDiagnosticsInformation",
+		"NvimTreeLspDiagnosticsHint",
+		"NvimTreeBg"
+	},
 	exclude = {
 		"BufferLineTabClose",
 		"BufferlineBufferSelected",

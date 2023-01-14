@@ -5,7 +5,7 @@ vim.api.nvim_create_autocmd(
 	{
 		pattern = { "*" },
 		callback = function()
-			vim.lsp.buf.formatting_sync()
+			vim.lsp.buf.format()
 		end,
 	}
 )
@@ -36,7 +36,7 @@ null_ls.setup({
 				group = augroup,
 				buffer = bufnr,
 				callback = function()
-					vim.lsp.buf.formatting_sync()
+					vim.lsp.buf.formatting_sync(nil, 100)
 				end,
 			})
 		end
